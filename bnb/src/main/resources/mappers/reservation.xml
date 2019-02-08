@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bit.bnb.reservation.dao.ReservationDao">
+<select id="getReservation" resultType="ReservationInfo">
+	SELECT * FROM reservation where roomsId = #{roomsId}
+</select>
+
+<select id="getDuration" resultType="int">
+	SELECT (TO_DAYS(checkIn)-TO_DAYS(#{nowStr})) FROM reservation WHERE roomsId=#{roomsId}
+	and checkIn>#{checkInStr} order by checkIn limit 0,1
+</select>
+
+<insert id="ReservationDo" parameterType="ReservationInfo">
+INSERT INTO `bnb`.`reservation`
+(
+`hostId`,
+`userId`,
+`checkIn`,
+`checkOut`,
+`roomsId`,
+`price`,
+`people`,
+`day`
+)
+VALUES
+(
+#{hostId},
+#{userId},
+#{checkIn},
+#{checkOut},
+#{roomsId},
+#{price}<!-- *(TO_DAYS(#{checkOut})-TO_DAYS(#{checkIn})) -->,
+#{people},
+TO_DAYS(#{checkOut})-TO_DAYS(#{checkIn})
+);
+</insert>
+
+<select id="getPrice" resultType="int">
+	select (b.price_weekdays) * ((TO_DAYS(#{checkOutStr})-TO_DAYS(#{checkInStr}))-#{cnt}) + b.price_weekend*#{cnt} from
+	reservation a join rooms b on b.roomsId=#{roomsId} limit 0,1;
+</select>
+
+<update id="deposit">
+	UPDATE `bnb`.`user`
+SET
+`point` = #{price} + point
+WHERE `userId` = #{hostId}
+</update>
+
+<select id="withdraw" resultType="com.bit.bnb.user.model.UserVO">
+	SELECT * FROM bnb.user WHERE `userId` = #{userId} and host = 1
+</select>
+
+
+<update id="withdrawDo">
+UPDATE `bnb`.`user`
+SET
+
+`point` = point - #{price}
+
+WHERE `userId` = #{userId}
+
+</update>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

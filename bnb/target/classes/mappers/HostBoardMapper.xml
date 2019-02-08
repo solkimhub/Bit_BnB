@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mappers.HostBoardMapper">
+
+	<insert id="insertPost" parameterType="com.bit.bnb.hostboard.model.PostVO" 
+		useGeneratedKeys="true" keyProperty="postNo">
+		insert into hostBoard (userId, title, content, date, viewCnt, commentCnt) 
+		value(#{userId}, #{title}, #{content}, CURRENT_TIMESTAMP, 0, 0)
+	</insert>
+	
+	<select id="selectPost" resultType="com.bit.bnb.hostboard.model.PostVO">
+		select hb.postNo, hb.userId, hb.title, hb.content, hb.date, hb.viewCnt, u.nickName, 
+		hb.commentCnt from hostBoard as hb join user as u on u.userId = hb.userId where postNo=#{postNo}
+	</select>
+	
+	<!-- <select id="selectPostList" resultType="com.bit.bnb.hostboard.model.PostVO">
+		select * from hostBoard order by postNo desc
+	</select> -->
+	
+	<!-- <select id="getPostList" parameterType="java.util.HashMap" resultType="com.bit.bnb.hostboard.model.PostVO">
+		<![CDATA[select * from hostBoard where postNo > 0 order by postNo desc limit #{firstRow}, #{postCountPerPage}]]>
+	</select> -->
+	
+	<select id="getPostList" parameterType="java.util.HashMap" resultType="com.bit.bnb.hostboard.model.PostVO">
+		<![CDATA[select hb.postNo, hb.userId, hb.title, hb.content, hb.date, hb.viewCnt, u.nickName, 
+		hb.commentCnt from hostBoard as hb join user as u on u.userId = hb.userId 
+		where postNo > 0 order by postNo desc limit #{firstRow}, #{postCountPerPage}]]>
+	</select>
+	
+	<select id="getPostTotalCount" resultType="int">
+		select postTotalCount from postTotalCount where idx=1
+	</select>
+	
+	<update id="modifyPost" parameterType="com.bit.bnb.hostboard.model.ModifyVO">
+		update hostBoard set title=#{title}, content=#{content} where postNo=#{postNo}
+	</update>
+	
+	<update id="upPostTotalCount">
+		update postTotalCount set postTotalCount = postTotalCount + 1 where idx=1
+	</update>
+	
+	<update id="downPostTotalCount">
+		update postTotalCount set postTotalCount = postTotalCount - 1 where idx=1
+	</update>
+
+	<delete id="deletePost">
+		delete from hostBoard where postNo=#{postNo}
+	</delete>
+	
+	<update id="upViewCnt">
+		update hostBoard set viewCnt = viewCnt + 1 where postNo=#{postNo}
+	</update>
+
+</mapper>
+
+ 
+        

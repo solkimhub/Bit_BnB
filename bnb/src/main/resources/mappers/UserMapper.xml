@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mappers.UserMapper">
+
+	<insert id="insertUser" parameterType="com.bit.bnb.user.model.UserVO">
+		insert into user 
+		values (#{userId}, #{userPw}, #{userName}, #{userPhoto}, #{host}, #{admin}, #{userKey}, 
+		#{userCheck}, #{point}, #{disabled}, #{birth}, #{userInfo}, #{nickName})
+	</insert>
+
+	<select id="selectUser" resultType="com.bit.bnb.user.model.UserVO">
+		select * from user where userId=#{userId}
+	</select>
+	
+	<select id="selectNickName" resultType="com.bit.bnb.user.model.UserVO">
+		select * from user where nickName=#{nickName}
+	</select>
+
+	<update id="updateUserKey">
+		update user set userKey='y' where userId=#{userId}
+	</update>
+	
+	<update id="forSearchPw" parameterType="java.util.HashMap">
+		update user set userKey=#{userKey}, disabled=#{disabled} where userId=#{userId}
+	</update>
+	
+	<update id="updateUserPw" parameterType="java.util.HashMap">
+		update user set userPw=#{userPw} where userId=#{userId}
+	</update>
+	
+	<update id="updateUserDisabled" parameterType="java.util.HashMap">
+		update user set disabled=1 where userId=#{userId}
+	</update>
+</mapper>

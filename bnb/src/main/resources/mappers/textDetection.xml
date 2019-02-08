@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bit.bnb.text.dao.TextDetectionDao">
+
+<select id="checkInfo" resultType="com.bit.bnb.user.model.UserVO">
+	SELECT * FROM bnb.user where userId = #{userId}
+</select>
+
+<update id="userUpdate">
+	UPDATE `bnb`.`user` SET `host` = 1 WHERE `userId` = #{userId};
+</update>
+
+</mapper>

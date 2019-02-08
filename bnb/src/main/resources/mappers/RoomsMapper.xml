@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.RoomsMapper">
+	<insert id="insertRooms"
+		parameterType="com.bit.bnb.rooms.model.RoomsVO"
+		useGeneratedKeys="true" keyProperty="roomsId">
+		INSERT INTO `bnb`.`rooms`
+		(`hostId`, `details`,
+		`avail_adults`,
+		`avail_children`, `avail_infants`,
+		`avail_bedroom`,
+		`avail_bed`,
+		`avail_bathroom`,
+		`amenities`,
+		`time_checkin`,
+		`time_checkout`,
+		`price_weekdays`,
+		`price_weekend`,
+		`address`,
+		`disabled`) VALUES (
+		#{hostId}, #{details},
+		#{avail_adults},
+		#{avail_children},
+		#{avail_infants}, #{avail_bedroom},
+		#{avail_bed},
+		#{avail_bathroom},
+		#{amenities},
+		#{time_checkin}, #{time_checkout},
+		#{price_weekdays},
+		#{price_weekend},
+		#{address},
+		#{disabled})
+	</insert>
+
+	<select id="selectRoomsList" parameterType="java.util.HashMap"
+		resultType="com.bit.bnb.rooms.model.RoomsVO">
+		SELECT * FROM
+		rooms
+		<where>
+			<if test="rv.roomsId != 0">
+				roomsId = #{rv.roomsId}
+			</if>
+			<if test="rv.hostId != null">
+				AND hostId like #{rv.hostId}
+			</if>
+			<if test="rv.details != null">
+				AND details like #{rv.details}
+			</if>
+			<if test="rv.avail_adults != 0">
+				AND avail_adults >= #{rv.avail_adults}
+			</if>
+			<if test="rv.avail_children != 0">
+				AND avail_children >= #{rv.avail_children}
+			</if>
+			<if test="rv.avail_infants != 0">
+				AND avail_infants >= #{rv.avail_infants}
+			</if>
+			<if test="rv.avail_bedroom != 0">
+				AND avail_bedroom >= #{rv.avail_bedroom}
+			</if>
+			<if test="rv.avail_bed != 0">
+				AND avail_bed >= #{rv.avail_bed}
+			</if>
+			<if test="rv.avail_bathroom != 0">
+				AND avail_bathroom >= #{rv.avail_bathroom}
+			</if>
+			<if test="rv.amenities != null">
+				AND amenities like #{rv.amenities}
+			</if>
+			<if test="rv.time_checkin != null">
+				AND time_checkin like #{rv.time_checkin}
+			</if>
+			<if test="rv.time_checkout != null">
+				AND time_checkout like #{rv.time_checkout}
+			</if>
+			<if test="rv.price_weekend != 0">
+				AND price_weekdays <![CDATA[<=]]>
+				#{rv.price_weekend}
+				AND price_weekdays >= #{rv.price_weekdays}
+				AND
+				price_weekend <![CDATA[<=]]>
+				#{rv.price_weekend}
+				AND price_weekend >= #{rv.price_weekdays}
+			</if>
+			<if test="rv.address != null">
+				AND address like CONCAT('%', #{rv.address},'%')
+			</if>
+			<if test="rv.disabled == 0">
+				AND disabled = 0
+			</if>
+			<if test="rv.disabled != 0">
+				AND disabled = {rv.disabled}
+			</if>
+			<if test="checkIn != null || checkOut != null">
+				AND rooms.roomsId NOT IN (SELECT
+				distinct roomsId
+				FROM
+				reservation
+				WHERE
+				(#{checkIn} <![CDATA[<=]]>
+				checkIn and checkIn <![CDATA[<]]>
+				#{checkOut}) OR
+				(#{checkIn} <![CDATA[<]]>
+				checkOut and checkOut <![CDATA[<=]]>
+				#{checkOut}))
+			</if>
+			<!-- 수정시 count 쿼리 동일 수정 -->
+			<!-- 어메니티, 가격, 비활성화 재고 -->
+		</where>
+		ORDER BY roomsId desc
+		<if test="paging != null">
+			LIMIT #{paging.offset}, #{paging.dataPerPage}
+		</if>
+	</select>
+
+	<!-- 페이징 처리를 위한 검색 카운트 -->
+	<select id="selectRoomsListCount"
+		parameterType="java.util.HashMap" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM
+		rooms
+		<where>
+			<if test="rv.roomsId != 0">
+				roomsId = #{rv.roomsId}
+			</if>
+			<if test="rv.hostId != null">
+				AND hostId like #{rv.hostId}
+			</if>
+			<if test="rv.details != null">
+				AND details like #{rv.details}
+			</if>
+			<if test="rv.avail_adults != 0">
+				AND avail_adults >= #{rv.avail_adults}
+			</if>
+			<if test="rv.avail_children != 0">
+				AND avail_children >= #{rv.avail_children}
+			</if>
+			<if test="rv.avail_infants != 0">
+				AND avail_infants >= #{rv.avail_infants}
+			</if>
+			<if test="rv.avail_bedroom != 0">
+				AND avail_bedroom >= #{rv.avail_bedroom}
+			</if>
+			<if test="rv.avail_bed != 0">
+				AND avail_bed >= #{rv.avail_bed}
+			</if>
+			<if test="rv.avail_bathroom != 0">
+				AND avail_bathroom >= #{rv.avail_bathroom}
+			</if>
+			<if test="rv.amenities != null">
+				AND amenities like #{rv.amenities}
+			</if>
+			<if test="rv.time_checkin != null">
+				AND time_checkin like #{rv.time_checkin}
+			</if>
+			<if test="rv.time_checkout != null">
+				AND time_checkout like #{rv.time_checkout}
+			</if>
+			<if test="rv.price_weekend != 0">
+				AND price_weekdays <![CDATA[<=]]>
+				#{rv.price_weekend}
+				AND price_weekdays >= #{rv.price_weekdays}
+				AND
+				price_weekend <![CDATA[<=]]>
+				#{rv.price_weekend}
+				AND price_weekend >= #{rv.price_weekdays}
+			</if>
+			<if test="rv.address != null">
+				AND address like CONCAT('%', #{rv.address},'%')
+			</if>
+			<if test="rv.disabled == 0">
+				AND disabled = 0
+			</if>
+			<if test="rv.disabled != 0">
+				AND disabled = {rv.disabled}
+			</if>
+			<if test="checkIn != null || checkOut != null">
+				AND rooms.roomsId NOT IN (SELECT
+				distinct roomsId
+				FROM
+				reservation
+				WHERE
+				(#{checkIn} <![CDATA[<=]]>
+				checkIn and checkIn <![CDATA[<]]>
+				#{checkOut}) OR
+				(#{checkIn} <![CDATA[<]]>
+				checkOut and checkOut <![CDATA[<=]]>
+				#{checkOut}))
+			</if>
+			<!-- 수정시 count 쿼리 동일 수정 -->
+			<!-- 어메니티, 가격, 비활성화 재고 -->
+		</where>
+		ORDER BY roomsId desc
+	</select>
+
+	<select id="selectMinPrice" resultType="java.lang.Integer">
+		SELECT
+		MIN(price_weekdays)
+		FROM `bnb`.`rooms`
+	</select>
+
+	<select id="selectMaxPrice" resultType="java.lang.Integer">
+		SELECT
+		MAX(price_weekend)
+		FROM `bnb`.`rooms`
+	</select>
+
+	<!-- 페이징 처리를 위한 테이블 카운트 -->
+	<select id="totalCount" parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM ${value}
+	</select>
+	<!-- <select id="selectRooms" parameterType="com.bit.bnb.rooms.model.RoomsVO" 
+		resultType="com.bit.bnb.rooms.model.RoomsVO"> SELECT * FROM `bnb`.`rooms` 
+		<where> <if test="roomsId != 0"> roomsId = #{roomsId} </if> <if test="hostId 
+		!= null"> AND hostId like #{hostId} </if> <if test="details != null"> AND 
+		details like #{details} </if> <if test="avail_adults != 0"> AND avail_adults 
+		>= #{avail_adults} </if> <if test="avail_children != 0"> AND avail_children 
+		>= #{avail_children} </if> <if test="avail_infants != 0"> AND avail_infants 
+		>= #{avail_infants} </if> <if test="avail_bedroom != 0"> AND avail_bedroom 
+		>= #{avail_bedroom} </if> <if test="avail_bed != 0"> AND avail_bed >= #{avail_bed} 
+		</if> <if test="avail_bathroom != 0"> AND avail_bathroom >= #{avail_bathroom} 
+		</if> <if test="amenities != null"> AND amenities like #{amenities} </if> 
+		<if test="time_checkin != null"> AND time_checkin like #{time_checkin} </if> 
+		<if test="time_checkout != null"> AND time_checkout like #{time_checkout} 
+		</if> <if test="price_weekdays != 0"> AND price_weekdays >= #{price_weekdays} 
+		</if> <if test="price_weekend != 0"> AND price_weekend >= #{price_weekend} 
+		</if> <if test="address != null"> AND details like #{address} </if> <if test="disabled 
+		!= 0"> AND disabled >= #{disabled} </if> 어메니티, 가격2, 비활성화 재고 </where> ORDER 
+		BY roomsId desc; </select> -->
+
+	<update id="updateRooms"
+		parameterType="com.bit.bnb.rooms.model.RoomsVO">
+		<!-- UPDATE `bnb`.`rooms` SET `time_checkin` = '14:00', `time_checkout` 
+			= '12:00' WHERE (`roomsId` = '2'); -->
+
+		UPDATE `bnb`.`rooms` SET
+		`hostId`=#{hostId},
+		`details`=#{details},
+		`avail_adults`=#{avail_adults},
+		`avail_children`=#{avail_children},
+		`avail_infants`=#{avail_infants},
+		`avail_bedroom`= #{avail_bedroom},
+		`avail_bed`=#{avail_bed},
+		`avail_bathroom`= #{avail_bathroom},
+		`amenities`= #{amenities},
+		`time_checkin`=#{time_checkin},
+		`time_checkout`=#{time_checkout},
+		`price_weekdays`=#{price_weekdays},
+		`price_weekend`= #{price_weekend},
+		`address`=#{address},
+		`disabled`=
+		#{disabled}
+
+		WHERE roomsId =
+		#{roomsId}
+
+	</update>
+
+	<delete id="deleteRooms"
+		parameterType="com.bit.bnb.rooms.model.RoomsVO">
+		DELETE FROM `bnb`.`rooms` WHERE roomsId = #{roomsId}
+	</delete>
+
+	<!-- 편의시설 부분 -->
+	<select id="selectAmenities"
+		parameterType="com.bit.bnb.rooms.model.AmenitiesVO"
+		resultType="com.bit.bnb.rooms.model.AmenitiesVO">
+		SELECT * FROM bnb.amenities_ref
+		<where>
+			<if test="amenities_idx != 0">
+				amenities_idx = #{amenities_idx}
+			</if>
+			<if test="amenities_details != null">
+				AND amenities_details like #{amenities_details}
+			</if>
+		</where>
+		ORDER BY amenities_idx ASC
+	</select>
+
+	<!-- 리뷰 부분 -->
+	<select id="selectRoomsReview" parameterType="java.util.HashMap"
+		resultType="com.bit.bnb.rooms.model.RoomsReviewVO">
+		SELECT * FROM `bnb`.`review` rv INNER JOIN
+		`bnb`.`reservation` rs ON
+		rv.reservationNum = rs.reservationNum
+		INNER JOIN `bnb`.`user` u ON
+		rs.userId = u.userId WHERE
+		rs.roomsId = #{roomsId}
+		ORDER BY reviewDate
+		DESC
+		<if test="paging != null">
+			LIMIT #{paging.offset}, #{paging.dataPerPage}
+		</if>
+	</select>
+
+	<!-- 리뷰 부분 -->
+	<select id="selectRoomsReviewSummary"
+		resultType="com.bit.bnb.rooms.model.RoomsReviewSummaryVO">
+		SELECT roomsId, count(*) reviewCount, avg(scope) avgScope
+		FROM `bnb`.`review` rv
+		INNER
+		JOIN `bnb`.`reservation` rs ON
+		rv.reservationNum =
+		rs.reservationNum
+		GROUP BY roomsId
+	</select>
+
+	<!-- 리뷰 부분 각 숙소에 대한 리뷰 수 count -->
+	<select id="selectRoomsReviewCount"
+		parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT count(*)
+		reviewCount
+		FROM `bnb`.`review` rv
+		INNER
+		JOIN `bnb`.`reservation` rs ON
+		rv.reservationNum =
+		rs.reservationNum
+		WHERE roomsId = #{roomsId}
+	</select>
+
+
+	<select id="selectRoomsHost"
+		parameterType="com.bit.bnb.user.model.UserVO"
+		resultType="com.bit.bnb.user.model.UserVO">
+		SELECT * FROM `bnb`.`user`
+		<where>
+			<if test="userId != null">
+				AND userId = #{userId}
+			</if>
+		</where>
+	</select>
+	<!-- SELECT roomsId FROM rooms r WHERE r.roomsId NOT IN (select roomsId 
+		from reservation where checkIn >= '2018-11-15' and checkOut <= '2019-01-02' 
+		group by roomsId); -->
+
+	<!-- https://m.blog.naver.com/amabile29/221008599472 -->
+	<insert id="insertRoomsPhoto"
+		parameterType="com.bit.bnb.rooms.model.RoomsImgVO">
+		INSERT INTO `bnb`.`roomsimg` (`filename`, `roomsId`,
+		`priority`) VALUES (#{filename}, #{roomsId}, #{priority})
+	</insert>
+
+	<update id="updateRoomsPhoto"
+		parameterType="com.bit.bnb.rooms.model.RoomsImgVO">
+		UPDATE `bnb`.`roomsimg` SET
+		`roomsId`=#{roomsId},
+		`priority`=#{priority}
+		WHERE filename =
+		#{filename}
+	</update>
+
+	<select id="selectRoomsPhoto"
+		parameterType="com.bit.bnb.rooms.model.RoomsImgVO"
+		resultType="com.bit.bnb.rooms.model.RoomsImgVO">
+		SELECT * FROM `bnb`.`roomsimg`
+		<where>
+			<if test="roomsId != 0">
+				AND roomsId = #{roomsId}
+			</if>
+			<if test="filename != null">
+				AND filename = #{filename}
+			</if>
+			<if test="priority != 0">
+				AND priority = #{priority}
+			</if>
+		</where>
+		ORDER BY priority ASC
+	</select>
+
+	<delete id="deleteRoomsPhoto"
+		parameterType="com.bit.bnb.rooms.model.RoomsImgVO">
+		DELETE FROM `bnb`.`roomsimg`
+		<where>
+			<if test="roomsId != 0">
+				AND roomsId = #{roomsId}
+			</if>
+			<if test="filename != null">
+				AND filename = #{filename}
+			</if>
+			<if test="priority != 0">
+				AND priority = #{priority}
+			</if>
+		</where>
+	</delete>
+
+	<select id="selectRandomRoom"
+		resultType="com.bit.bnb.rooms.model.RoomsVO">
+		SELECT * FROM `bnb`.`rooms` where disabled=0 order by rand() LIMIT 0, 1
+	</select>
+</mapper>

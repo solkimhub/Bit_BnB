@@ -1,0 +1,252 @@
+@charset "UTF-8";
+
+/* navbar 투명처리 */
+.navbar.transparent.navbar-inverse .navbar-inner {
+	border-width: 0px;
+	-webkit-box-shadow: 0px 0px;
+	box-shadow: 0px 0px;
+	background-color: rgba(0, 0, 0, 0.0);
+	background-image: -webkit-gradient(linear, 50.00% 0.00%, 50.00% 100.00%, color-stop(0%,
+		rgba(0, 0, 0, 0.00)), color-stop(100%, rgba(0, 0, 0, 0.00)));
+	background-image: -webkit-linear-gradient(270deg, rgba(0, 0, 0, 0.00) 0%,
+		rgba(0, 0, 0, 0.00) 100%);
+	background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%,
+		rgba(0, 0, 0, 0.00) 100%);
+}
+
+* {
+	font-family: 'Nanum Gothic', sans-serif;
+}
+
+body {
+	/* 부트스트랩 네비바 사용을 위한 패딩 */
+	padding-top: 120px;
+	/* background-color: gray; */
+}
+
+#mainback {
+	background: url(../images/back.jpg) no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+#logo {
+	height: 50px;
+	margin-left: 20px;
+}
+
+#header {
+	height: 70px;
+	background-color: white;
+}
+
+#mypage, #login {
+	background-color: white;
+	height: 30px;
+	width: 100px;
+}
+
+#infobutton {
+	float: right;
+	height: 60px;
+	line-height: 70px;
+	margin-right: 20px;
+}
+
+#search {
+	width: 600px;
+	height: 600px;
+	margin-top: 70px;
+	margin-left: 80px;
+	background-color: white;
+	border-radius: 30px;
+}
+
+#title {
+	text-align: center;
+	padding-top: 30px;
+}
+
+#search_content {
+	width: 500px;
+	height: 500px;
+	margin: 0 auto;
+	padding-top: 40px;
+}
+
+select {
+	width: 193px;
+	height: 40px;
+}
+
+label {
+	font-size: 18px;
+}
+
+.search_wrap {
+	margin-left: 40px;
+}
+
+.section {
+	position: relative;
+	top:250px;
+}
+
+.section .section-center {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	-webkit-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
+
+#booking {
+	font-family: 'Lato', sans-serif;
+}
+
+.booking-form {
+	max-width: 586px;
+	width: 100%;
+	margin: auto;
+}
+
+.booking-form .form-group {
+	position: relative;
+	margin-bottom: 0px;
+}
+
+.booking-form>form .row.no-margin {
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
+.booking-form>form .row.no-margin [class*="col-"] {
+	padding-right: 0px;
+	padding-left: 0px;
+}
+
+.booking-form .form-control {
+	background-color: #fff;
+	height: 80px;
+	padding: 25px 20px 0px;
+	border-radius: 0px;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: #0e2753;
+	border: 1px solid #dddee9;
+	border-bottom: 0px;
+	font-size: 20px;
+	font-weight: 700;
+	-webkit-transition: 0.2s all;
+	transition: 0.2s all;
+}
+
+.booking-form [class*="col-"]+[class*="col-"] .form-group .form-control
+	{
+	border-left: 0px;
+}
+
+.booking-form .form-control::-webkit-input-placeholder {
+	color: #dddee9;
+}
+
+.booking-form .form-control:-ms-input-placeholder {
+	color: #dddee9;
+}
+
+.booking-form .form-control::placeholder {
+	color: #dddee9;
+}
+
+.booking-form .form-control:focus {
+	background: #f9f9f9;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.booking-form input[type="date"].form-control:invalid {
+	color: #dddee9;
+}
+
+.booking-form select.form-control {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+.booking-form select.form-control:invalid {
+	color: #dddee9;
+}
+
+.booking-form select.form-control option {
+	color: #0e2753;
+}
+
+.booking-form select.form-control+.select-arrow {
+	position: absolute;
+	right: 0px;
+	bottom: 4px;
+	width: 32px;
+	line-height: 32px;
+	height: 32px;
+	text-align: center;
+	pointer-events: none;
+	color: #dddee9;
+	font-size: 20px;
+}
+
+.booking-form select.form-control+.select-arrow:after {
+	content: '\279C';
+	display: block;
+	-webkit-transform: rotate(90deg);
+	transform: rotate(90deg);
+}
+
+.booking-form .form-label {
+	position: absolute;
+	left: 20px;
+	top: 10px;
+	color: #f14634;
+	font-weight: 400;
+	line-height: 24px;
+	font-style: italic;
+	height: 24px;
+	font-size: 14px;
+}
+
+.booking-form .submit-btn {
+	color: #fff;
+	background-color: #f14634;
+	font-weight: 700;
+	height: 80px;
+	font-size: 18px;
+	text-transform: capitalize;
+	border: none;
+	width: 100%;
+}
+
+@media only screen and (max-width: 767px) {
+	.booking-form [class*="col-"]+[class*="col-"] .form-group .form-control
+		{
+		border-left: 1px solid #dddee9;
+	}
+}
+
+.img_overlay {
+    position: relative;
+}
+
+.img_overlay::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Adjust the color values to achieve desired darkness */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25));
+}
+

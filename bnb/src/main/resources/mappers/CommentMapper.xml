@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mappers.CommentMapper">
+
+	<!-- 댓글 작성 -->
+	<insert id="insertComment" parameterType="com.bit.bnb.hostboard.model.CommentVO" 
+		useGeneratedKeys="true" keyProperty="commentNo">
+		insert into comment (postNo, userId, commentContent, commentDate) 
+		values(#{postNo}, #{userId}, #{commentContent}, sysdate())
+	</insert>
+
+	<!-- 해당 포스팅의 댓글 받기 -->
+	<select id="getCommentList" resultType="com.bit.bnb.hostboard.model.CommentVO">
+		select comm.commentNo, comm.postNo, comm.userId, comm.commentContent, comm.commentDate, u.nickName 
+		from comment as comm join user as u 
+		on u.userId = comm.userId 
+		where postNo = #{postNo} 
+		order by commentNo desc;
+	</select>
+	
+	<!-- 댓글 수정시 내용 받기 -->
+	<select id="getCommentOne" resultType="com.bit.bnb.hostboard.model.CommentVO">
+		select * from comment where commentNo=#{commentNo}
+	</select>
+	
+	<!-- 댓글 수정 -->
+	<update id="modifyComment">
+		update comment set commentContent=#{commentContent} where commentNo=#{commentNo}
+	</update>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="deleteComment">
+		delete from comment where commentNo=#{commentNo}
+	</delete>
+	
+	<update id="upCommentCnt">
+		update hostBoard set commentCnt = commentCnt + 1 where postNo=#{postNo}
+	</update>
+	
+	<update id="downCommentCnt">
+		update hostBoard set commentCnt = commentCnt - 1 where postNo=#{postNo}
+	</update>
+
+</mapper>

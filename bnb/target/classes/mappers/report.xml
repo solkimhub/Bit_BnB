@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mappers.report">
+    <select id="notckreportList" parameterType="int" resultType="com.bit.bnb.report.model.ReportVO">
+        select *
+        from report
+        order by reservationNum desc
+        limit #{firstRow},10;
+
+    </select>
+    <select id="getHostId" parameterType="com.bit.bnb.report.model.ReportVO" resultType="com.bit.bnb.report.model.ReportVO">
+        select * from report r inner JOIN  reservation r2 on r.reservationNum = r2.reservationNum where r.reservationNum=#{reservaionNum}
+
+    </select>
+
+
+    <insert id="insert" parameterType="com.bit.bnb.report.model.ReportVO">
+        insert into report (reservationNum, reportContent)
+        values (#{reservationNum}, #{reportContent});
+    </insert>
+
+    <select id="hostGetReportCk" parameterType="com.bit.bnb.report.model.ReportVO" resultType="int">
+        select count(*) from report r inner JOIN reservation r2 on r.reservationNum = r2.reservationNum where r.reportCk='T' and  r2.hostId=#{hostId}
+    </select>
+
+    <select id="totalCount" resultType="int">
+        select count(*)
+        from report;
+    </select>
+
+    <update id="ckupdate" parameterType="com.bit.bnb.report.model.ReportVO">
+        update report SET reportCk=#{reportCk} where reservationNum=#{reservationNum}
+    </update>
+    <update id="roomDisabled" parameterType="java.lang.String">
+        update rooms set disabled=0 where hostId=#{hostId}
+    </update>
+
+    <select id="procedure" statementType="CALLABLE" parameterType="com.bit.bnb.report.model.ReportVO">
+        {call reportprocedure (#{reportCk, mode=IN, jdbcType=VARCHAR},#{reservationNum, mode=IN, jdbcType=INTEGER},#{result, mode=OUT, jdbcType=INTEGER, javaType=_int})}
+    </select>
+</mapper>

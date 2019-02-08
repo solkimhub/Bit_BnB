@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 인터페이스가 있는 패키지+클래스명 -->
+<mapper namespace="com.bit.bnb.mypage.dao.WishDao">
+
+	<!-- 즐겨찾기넣어주기 -->
+	<insert id="wishInsert">
+		insert into wish(userId, roomsId) values(#{userId},
+		#{roomsId})
+	</insert>
+
+	<!-- 즐겨찾기목록 -->
+	<select id="wishList"
+		resultType="com.bit.bnb.mypage.model.WishVO">
+		<!-- select r.address, w.idx, r.hostId, r.price_weekdays, r.price_weekend, 
+			left(r.details, 100) as details, w.userId, w.roomsId from rooms r inner join 
+			wish w on r.roomsId = w.roomsId and w.userId = #{userId} and address like 
+			CONCAT('%',#{address},'%') -->
+		select u.userName, ro.address, ro.roomsId, ro.hostId, ro.price_weekdays,
+		ro.price_weekend, w.userId, count(r2.reviewContent) reviewCount,
+		avg(r2.scope) avgScope
+		from rooms ro left outer join wish w on
+		ro.roomsId = w.roomsId left
+		outer join reservation r on ro.roomsId =
+		r.roomsId
+		left outer join review r2 on r.reservationNum =
+		r2.reservationNum
+		left outer join user u on u.userId=ro.hostId
+		where w.userId=#{userId} and ro.address like
+		CONCAT('%',#{address},'%')
+		group by ro.roomsId;
+	</select>
+
+	<!-- 즐겨찾기에있는 룸 중에 사진뽑긔 -->
+	<select id="wishRoomImg"
+		resultType="com.bit.bnb.mypage.model.WishVO">
+		select w.roomsId, ri.filename, ri.priority, r.address from
+		wish w left outer join roomsimg ri on ri.roomsId = w.roomsId
+		left outer
+		join rooms r on r.roomsId=w.roomsId
+		where w.userId = #{userId} and
+		r.address like CONCAT('%',#{address},'%')
+		group by w.roomsId
+	</select>
+
+	<!-- div생성용 즐겨찾기 목록 -->
+	<select id="wishDivList"
+		resultType="com.bit.bnb.mypage.model.WishVO">
+		select DISTINCT SUBSTRING_INDEX(r.address, ' ', 2) as
+		address from rooms r inner join wish w
+		on r.roomsId = w.roomsId and
+		w.userId = #{userId}
+	</select>
+
+	<!-- div생성시 각 지역별 위시 개수찾기 -->
+	<select id="wishDivCnt" resultType="int">
+		select count(*) from rooms r
+		inner join wish w
+		on r.roomsId = w.roomsId and w.userId = #{userId}
+		and
+		r.address like
+		CONCAT('%',#{address},'%')
+	</select>
+
+	<!-- 즐겨찾기해제 -->
+	<delete id="wishDelete">
+		delete from wish where userId=#{userId}
+		and roomsId =
+		#{roomsId}
+	</delete>
+
+	<!-- 즐겨찾기있는지 확인 -->
+	<select id="wishSelect" resultType="int">
+		select count(*) from wish
+		where userId=#{userId}
+		and roomsId =
+		#{roomsId}
+	</select>
+
+	<!-- 즐겨찾기 div목록 사진 -->
+	<select id="wishDivImg"
+		resultType="com.bit.bnb.mypage.model.WishVO">
+		select DISTINCT SUBSTRING_INDEX(r.address, ' ', 2) as
+		address, ri.filename, ri.roomsId from rooms r inner join wish w
+		on
+		r.roomsId = w.roomsId and w.userId = #{userId}
+		inner join roomsimg ri on r.roomsId=ri.roomsId
+		group by address;
+	</select>
+
+</mapper>

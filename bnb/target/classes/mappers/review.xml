@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 인터페이스가 있는 패키지+클래스명 -->
+<mapper namespace="com.bit.bnb.mypage.dao.ReviewDao">
+
+	<!-- 내가쓴 리뷰리스트뿌리기 -->
+	<select id="reviewToList"
+		resultType="com.bit.bnb.mypage.model.ReviewVO">
+		select re.reservationNum, r.userId, r.hostId,
+		re.scope ,
+		u.userPhoto,
+		re.reviewContent , re.reviewDate from reservation r inner
+		join review
+		re
+		on r.reservationNum = re.reservationNum
+		inner join user u
+		on r.userId = u.userId
+		where r.userId = #{userId}
+		order by
+		re.reviewDate
+		desc;
+	</select>
+
+	<!-- 작성해야할리스트찾기 -->
+	<select id="reviewWriteList"
+		resultType="com.bit.bnb.mypage.model.ReviewVO">
+		SELECT r.reservationNum, r.userId, r.hostId,
+		re.reviewContent,
+		r.checkIn, r.checkOut from reservation r
+		LEFT OUTER JOIN review re
+		ON
+		re.reservationNum = r.reservationNum
+		LEFT OUTER JOIN report r2 on
+		r.reservationNum = r2.reservationNum
+		where
+		re.reviewContent is null and
+		r2.reportContent is null
+		<![CDATA[ and r.checkOut <= current_timestamp ]]>
+		and r.userId = #{userId}
+		order by r.checkIn
+	</select>
+
+	<!-- 리뷰작성하기 -->
+	<insert id="reviewWrite">
+		insert into review (reservationNum,
+		reviewContent,
+		scope)
+		values (#{reservationNum}, #{reviewContent},
+		#{scope})
+	</insert>
+
+	<!-- 리뷰 셀렉하기 -->
+	<select id="reviewPick"
+		resultType="com.bit.bnb.mypage.model.ReviewVO">
+		select * from
+		review where reservationNum =
+		#{reservationNum}
+	</select>
+
+	<!-- 수정하기 -->
+	<update id="reviewEdit">
+		update review set reviewContent = #{reviewContent},
+		scope = #{scope} where reservationNum = #{reservationNum}
+	</update>
+
+	<!-- 삭제하기 -->
+	<delete id="reviewDelete">
+		delete from review where reservationNum =
+		#{reservationNum}
+	</delete>
+
+	<!-- 리뷰검색하기 내가 쓴 후기에서 -->
+	<select id="searchReview"
+		resultType="com.bit.bnb.mypage.model.ReviewVO">
+		select re.reservationNum, r.hostId, u.userName, u.userPhoto,
+		re.scope ,
+		re.reviewContent , re.reviewDate from reservation r inner
+		join review
+		re
+		on r.reservationNum = re.reservationNum
+		inner join user u on r.userId
+		= u.userId
+		where r.userId = #{userId}
+		<if test="rvs.searchType != null">
+			<if test="rvs.searchType == 'all'.toString()">
+				and re.reviewContent LIKE CONCAT('%',#{rvs.keyword},'%')
+				or r.hostId LIKE CONCAT('%',#{rvs.keyword},'%')
+			</if>
+			<if test="rvs.searchType == 'reviewContent'.toString()">
+				and re.reviewContent LIKE CONCAT('%',#{rvs.keyword},'%')
+			</if>
+			<if test="rvs.searchType == 'hostId'.toString()">
+				and r.hostId LIKE CONCAT('%',#{rvs.keyword},'%')
+			</if>
+			<!-- <if test="rvs.searchType == 'scope'.toString()"> and re.scope LIKE 
+				CONCAT('%',#{rvs.keyword},'%') </if> -->
+		</if>
+		order by re.reviewDate desc
+	</select>
+
+	<!-- 리뷰검색하기 호스트가 내게 써준 것중 -->
+	<select id="searchReviewHost"
+		resultType="com.bit.bnb.hostpage.model.EvaluationVO">
+		select re.hostId, u.userPhoto, re.roomsId,
+		e.evaluationContent,
+		u.userName,
+		e.evaluationDate as reviewDate from reservation re inner
+		JOIN
+		evaluation e on
+		re.reservationNum
+		= e.reservationNum inner JOIN user
+		u
+		on u.userId = re.hostId where
+		re.userId
+		= #{userId} and
+		e.evaluationContent is not null
+		<if test="rvs.searchType != null">
+			<if test="rvs.searchType == 'all'.toString()">
+				and e.evaluationContent LIKE
+				CONCAT('%',#{rvs.keyword},'%')
+				or re.hostId LIKE
+				CONCAT('%',#{rvs.keyword},'%')
+			</if>
+			<if test="rvs.searchType == 'reviewContent'.toString()">
+				and e.evaluationContent LIKE
+				CONCAT('%',#{rvs.keyword},'%')
+			</if>
+			<if test="rvs.searchType == 'hostId'.toString()">
+				and u.userName LIKE CONCAT('%',#{rvs.keyword},'%')
+			</if>
+		</if>
+	</select>
+
+	<!-- 호스트가 쓴 나에대한 리뷰 리스트 -->
+	<select id="hostReview"
+		resultType="com.bit.bnb.hostpage.model.EvaluationVO">
+		select re.hostId,
+		u.userName,
+		u.userPhoto,
+		re.roomsId,
+		e.evaluationContent,
+		e.evaluationDate as reviewDate
+		from reservation re
+		inner JOIN
+		evaluation e on re.reservationNum = e.reservationNum
+		inner
+		JOIN user u
+		on u.userId = re.hostId
+		where re.userId = #{userId}
+		and
+		e.evaluationContent is not null
+		order by e.evaluationDate desc
+	</select>
+
+	<!-- 리뷰의 숙박정보조회 -->
+	<select id="reviewChk" resultType="com.bit.bnb.reservation.model.ReservationInfo">
+		select * from review re left outer join reservation rv on
+		re.reservationNum=rv.reservationNum where re.reservationNum=#{reservationNum};
+	</select>
+	<select id="reviewChk2" resultType="com.bit.bnb.reservation.model.ReservationInfo">
+		select * from reservation where reservationNum=#{reservationNum};
+	</select>
+</mapper>

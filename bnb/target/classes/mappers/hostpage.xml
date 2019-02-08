@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mappers.hostpage">
+    <select id="ckMyRooms" resultType="com.bit.bnb.hostpage.model.MyRoomVO">
+
+        select roomsId, count(*) reservationCount
+        from reservation
+        where checkOut <![CDATA[ > ]]> current_timestamp
+          and hostId = #{userId}
+        group by roomsId
+
+    </select>
+    <select id="getRoomMember" parameterType="int" resultType="com.bit.bnb.hostpage.model.ReservationRoomUserVO">
+        select re.reservationNum,
+               re.userId,
+               u.userName,
+               u.userPhoto,
+               re.checkIn,
+               re.checkOut,
+               re.price,
+               re.people
+        from reservation re
+                 inner JOIN user u on re.userId = u.userId
+        where re.checkOut <![CDATA[ > ]]> current_timestamp
+          and re.roomsId = #{roomsId}
+    </select>
+
+    <select id="getNotEvaluation" parameterType="java.lang.String" resultType="com.bit.bnb.hostpage.model.EvaluationVO">
+        select re.userId, u.userName, u.userPhoto, re.roomsId, re.checkIn, re.checkOut, re.reservationNum
+        from reservation re
+                 LEFT OUTER JOIN evaluation e on re.reservationNum = e.reservationNum
+                 inner JOIN user u on re.userId = u.userId
+        where hostId = #{hostId}
+          and e.evaluationContent is null
+          and re.checkOut <![CDATA[ < ]]> current_timestamp
+        ORDER BY checkOut desc;
+    </select>
+    <select id="getEvaluation" parameterType="java.lang.String" resultType="com.bit.bnb.hostpage.model.EvaluationVO">
+        select re.userId,
+               u.userName,
+               u.userPhoto,
+               re.roomsId,
+               re.checkIn,
+               re.checkOut,
+               re.reservationNum,
+               e.evaluationContent,
+               e.evaluationDate
+        from reservation re
+                 inner JOIN evaluation e on re.reservationNum = e.reservationNum
+                 inner JOIN user u on re.userId = u.userId
+        where hostId = #{hostId}
+          and e.evaluationContent is not null
+          and re.checkOut <![CDATA[ < ]]>current_timestamp
+        ORDER BY e.evaluationDate desc;
+    </select>
+
+    <insert id="insertEvaluation" parameterType="com.bit.bnb.hostpage.model.EvaluationVO">
+        insert into evaluation (reservationNum, evaluationContent)
+        VALUES (#{reservationNum}, #{evaluationContent})
+    </insert>
+    <select id="selectOneEvaluation" parameterType="int" resultType="com.bit.bnb.hostpage.model.EvaluationVO">
+        select * from evaluation where reservationNum=#{reservationNum}
+    </select>
+
+    <update id="updateEvaluation" parameterType="com.bit.bnb.hostpage.model.EvaluationVO">
+        update evaluation set evaluationContent=#{evaluationContent}, evaluationDate=CURRENT_TIMESTAMP where reservationNum=#{reservationNum}
+    </update>
+    <select id="allprice" parameterType="java.lang.String" resultType="int">
+
+        select sum(price) from reservation where hostId=#{hostId}
+    </select>
+    <select id="myroomview" parameterType="java.lang.String" resultType="int">
+
+        select roomsId from rooms where hostId=#{hostId};
+    </select>
+    <delete id="delReservation" parameterType="int">
+        delete from reservation where reservationNum=#{reservationNum}
+    </delete>
+</mapper>

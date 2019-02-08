@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 인터페이스가 있는 패키지+클래스명 -->
+<mapper namespace="com.bit.bnb.mypage.dao.MypageUserDao">
+
+	<!-- 유저 정보 수정 -->
+	<update id="userUpdate">
+		update user set 
+		userPw=#{userPw},
+		userName=#{userName},
+		userPhoto=#{userPhoto},
+		userInfo=#{userInfo}
+		where
+		userId=#{userId}
+	</update>
+
+	<!-- 유저정보픽 -->
+	<select id="userPick"
+		resultType="com.bit.bnb.user.model.UserVO">
+		select * from user
+		where userId=#{userId}
+	</select>
+
+	<!-- 유저탈퇴 -->
+	<update id="userDelete">
+		update user set disabled = false where
+		userId=#{userId}
+	</update>
+</mapper>

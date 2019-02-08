@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 인터페이스가 있는 패키지+클래스명 -->
+<mapper namespace="com.bit.bnb.mypage.dao.HistoryDao">
+
+	<!-- 내가다녀온 숙소정보 -->
+	<select id="historyList"
+		resultType="com.bit.bnb.mypage.model.HistoryVO">
+		select
+		ro.roomsId, ro.hostId, left(ro.details, 70) as details,
+		SUBSTRING_INDEX(ro.address, '
+		', 3) as address, re.reservationNum,
+		re.userId, re.checkIn,
+		re.checkOut, re.price, re.people
+		from rooms ro
+		inner join reservation re
+		on ro.roomsId=re.roomsId
+		where
+		userId=#{userId} and <![CDATA[ re.checkOut <= current_timestamp ]]>
+		order by re.checkOut desc
+	</select>
+
+	<!-- 다녀온 숙소의 이미지 -->
+	<select id="historyImg"
+		resultType="com.bit.bnb.mypage.model.HistoryVO">
+		select
+		ro.roomsId, ri.filename
+		from rooms ro
+		inner join reservation re
+		on
+		ro.roomsId=re.roomsId inner join roomsimg ri on re.roomsId=ri.roomsId
+		where userId=#{userId} and <![CDATA[ re.checkOut <= current_timestamp ]]>
+		group by re.roomsId;
+	</select>
+
+	<!-- 내가 다녀갈 숙소정보 -->
+	<select id="tripList"
+		resultType="com.bit.bnb.mypage.model.HistoryVO">
+		select
+		ro.roomsId, ro.hostId, left(ro.details, 70) as
+		details,
+		SUBSTRING_INDEX(ro.address, ' ', 3)
+		as address,
+		re.reservationNum,
+		re.userId, re.checkIn, re.checkOut,
+		re.price,
+		re.people
+		from rooms ro
+		inner join reservation re on
+		ro.roomsId=re.roomsId
+		where
+		userId=#{userId} and <![CDATA[ re.checkOut >=
+		current_timestamp ]]>
+		order by re.checkOut asc;
+	</select>
+
+	<!-- 다녀갈 숙소의 이미지 -->
+	<select id="tripImg" resultType="com.bit.bnb.mypage.model.HistoryVO">
+		select
+		ro.roomsId, ri.filename
+		from rooms ro
+		inner join reservation re
+		on
+		ro.roomsId=re.roomsId inner join roomsimg ri on re.roomsId=ri.roomsId
+		where userId=#{userId} and <![CDATA[ re.checkOut >= current_timestamp ]]>
+		group by re.roomsId;
+	</select>
+
+</mapper>
